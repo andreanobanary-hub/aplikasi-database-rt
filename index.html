@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Pendataan Warga RT</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-indigo-700 text-white shadow-md">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+      <div>
+        <h1 class="text-xl font-bold tracking-wide">Portal Digital RT</h1>
+        <p class="text-xs text-indigo-200">Sistem Pendataan Kependudukan & Administrasi</p>
+      </div>
+      <span class="text-xs bg-indigo-800/70 border border-indigo-500 px-3 py-1 rounded-full font-medium">Pengurus RT</span>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 py-6">
+    <!-- Stat Card Ringkasan -->
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+        <p class="text-xs text-slate-500 font-medium">Total Kepala Keluarga</p>
+        <p id="totalKK" class="text-2xl font-bold text-indigo-600 mt-1">-</p>
+      </div>
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+        <p class="text-xs text-slate-500 font-medium">Total Jiwa Terdata</p>
+        <p id="totalWarga" class="text-2xl font-bold text-emerald-600 mt-1">-</p>
+      </div>
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 col-span-2 md:col-span-1">
+        <p class="text-xs text-slate-500 font-medium">Warga Status Aktif</p>
+        <p id="totalAktif" class="text-2xl font-bold text-blue-600 mt-1">-</p>
+      </div>
+    </div>
+
+    <!-- Navigasi Tab -->
+    <div class="flex space-x-2 border-b border-slate-200 mb-6 overflow-x-auto">
+      <button onclick="switchTab('kk')" id="btnTabKK" class="py-2.5 px-4 font-semibold text-sm border-b-2 border-indigo-600 text-indigo-600 whitespace-nowrap">Input Data KK</button>
+      <button onclick="switchTab('warga')" id="btnTabWarga" class="py-2.5 px-4 font-semibold text-sm text-slate-500 hover:text-indigo-600 whitespace-nowrap">Input Anggota Warga</button>
+      <button onclick="switchTab('list')" id="btnTabList" class="py-2.5 px-4 font-semibold text-sm text-slate-500 hover:text-indigo-600 whitespace-nowrap">Daftar & Pencarian Warga</button>
+    </div>
+
+    <!-- Tab 1: Form Input KK -->
+    <section id="tabKK" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8">
+      <h2 class="text-lg font-bold mb-4 text-slate-800">Form Tambah Rumah / KK</h2>
+      <form id="formKK" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Nomor Kartu Keluarga (KK)</label>
+          <input type="number" id="id_kk" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="16 digit nomor KK">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Kepala Keluarga</label>
+          <input type="text" id="nama_kepala" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Sesuai KTP">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Blok / Nomor Rumah</label>
+          <input type="text" id="blok_nomor" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Contoh: A1 No. 05">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Status Kepemilikan/Tinggal</label>
+          <select id="status_tinggal" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+            <option value="Tetap">KTP Setempat (Rumah Sendiri)</option>
+            <option value="Kontrak">Kontrak / Sewa</option>
+            <option value="Kost">Kost</option>
+          </select>
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Nomor WhatsApp Aktif</label>
+          <input type="tel" id="no_hp" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Contoh: 08123456789">
+        </div>
+        <div class="md:col-span-2 mt-2">
+          <button type="submit" id="btnSubmitKK" class="w-full bg-indigo-600 text-white font-medium py-2.5 rounded-lg hover:bg-indigo-700 transition">Simpan Data KK</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Tab 2: Form Input Anggota Warga -->
+    <section id="tabWarga" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8 hidden">
+      <h2 class="text-lg font-bold mb-4 text-slate-800">Form Tambah Anggota Warga</h2>
+      <form id="formWarga" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">NIK (Nomor Induk Kependudukan)</label>
+          <input type="number" id="nik" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="16 digit NIK">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Nomor KK Terkait</label>
+          <input type="number" id="warga_id_kk" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Sesuai No. KK">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Lengkap</label>
+          <input type="text" id="warga_nama" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Sesuai KTP/Akta">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Jenis Kelamin</label>
+          <select id="warga_gender" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+            <option value="L">Laki-laki</option>
+            <option value="P">Perempuan</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Tanggal Lahir</label>
+          <input type="date" id="warga_tgl_lahir" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Hubungan Keluarga</label>
+          <select id="warga_hubungan" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+            <option value="Kepala Keluarga">Kepala Keluarga</option>
+            <option value="Istri">Istri</option>
+            <option value="Anak">Anak</option>
+            <option value="Famili Lain">Famili Lain</option>
+          </select>
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Kategori Khusus (Opsional)</label>
+          <select id="warga_kategori" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+            <option value="-">Tidak Ada</option>
+            <option value="Lansia">Lansia</option>
+            <option value="Balita">Balita</option>
+            <option value="Penerima Bansos">Penerima Bansos</option>
+            <option value="Disabilitas">Disabilitas</option>
+          </select>
+        </div>
+        <div class="md:col-span-2 mt-2">
+          <button type="submit" id="btnSubmitWarga" class="w-full bg-emerald-600 text-white font-medium py-2.5 rounded-lg hover:bg-emerald-700 transition">Simpan Anggota Warga</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Tab 3: Daftar Warga -->
+    <section id="tabList" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hidden">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-800">Daftar Seluruh Warga</h2>
+          <p class="text-xs text-slate-500">Data tersimpan di Google Sheets secara realtime</p>
+        </div>
+        <div class="flex gap-2 w-full sm:w-auto">
+          <input type="text" id="searchInput" oninput="filterTable()" placeholder="Cari nama / NIK..." class="border rounded-lg px-3 py-1.5 text-xs w-full sm:w-48 outline-none focus:ring-2 focus:ring-indigo-500">
+          <button onclick="fetchWargaData()" class="text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg font-medium whitespace-nowrap">Segarkan</button>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-100 text-slate-600 text-xs uppercase">
+            <tr>
+              <th class="p-3">Nama Lengkap</th>
+              <th class="p-3">NIK</th>
+              <th class="p-3">No. KK</th>
+              <th class="p-3">Hubungan</th>
+              <th class="p-3">Kategori</th>
+              <th class="p-3">Status</th>
+            </tr>
+          </thead>
+          <tbody id="tableBodyWarga" class="divide-y divide-slate-100">
+            <tr><td colspan="6" class="p-4 text-center text-slate-400">Klik segarkan atau buka tab ini untuk memuat data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // URL Google Apps Script yang sudah dimasukkan
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyWylxWJWBWOD2WhScR54BaKs0wjtwHfYU-S7Zi1RIyTA9WZf0xSzyUeqNPiKfr8ZYfuQ/exec";
+
+    let cachedWargaList = [];
+
+    function switchTab(tab) {
+      document.getElementById('tabKK').classList.add('hidden');
+      document.getElementById('tabWarga').classList.add('hidden');
+      document.getElementById('tabList').classList.add('hidden');
+
+      document.getElementById('btnTabKK').className = "py-2.5 px-4 font-semibold text-sm text-slate-500 hover:text-indigo-600 whitespace-nowrap";
+      document.getElementById('btnTabWarga').className = "py-2.5 px-4 font-semibold text-sm text-slate-500 hover:text-indigo-600 whitespace-nowrap";
+      document.getElementById('btnTabList').className = "py-2.5 px-4 font-semibold text-sm text-slate-500 hover:text-indigo-600 whitespace-nowrap";
+
+      if (tab === 'kk') {
+        document.getElementById('tabKK').classList.remove('hidden');
+        document.getElementById('btnTabKK').className = "py-2.5 px-4 font-semibold text-sm border-b-2 border-indigo-600 text-indigo-600 whitespace-nowrap";
+      } else if (tab === 'warga') {
+        document.getElementById('tabWarga').classList.remove('hidden');
+        document.getElementById('btnTabWarga').className = "py-2.5 px-4 font-semibold text-sm border-b-2 border-indigo-600 text-indigo-600 whitespace-nowrap";
+      } else if (tab === 'list') {
+        document.getElementById('tabList').classList.remove('hidden');
+        document.getElementById('btnTabList').className = "py-2.5 px-4 font-semibold text-sm border-b-2 border-indigo-600 text-indigo-600 whitespace-nowrap";
+        fetchWargaData();
+      }
+    }
+
+    // Ambil data ringkasan angka statistik
+    async function fetchSummary() {
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getSummary`);
+        const json = await res.json();
+        if (json.status === 'success') {
+          document.getElementById('totalKK').innerText = json.total_kk;
+          document.getElementById('totalWarga').innerText = json.total_warga;
+          document.getElementById('totalAktif').innerText = json.warga_aktif;
+        }
+      } catch (err) {
+        console.error("Gagal mengambil ringkasan data:", err);
+      }
+    }
+
+    // Ambil daftar tabel warga
+    async function fetchWargaData() {
+      const tbody = document.getElementById('tableBodyWarga');
+      tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">Sedang memuat data dari Spreadsheet...</td></tr>';
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getWarga`);
+        const json = await res.json();
+        if (json.status === 'success' && json.data && json.data.length > 0) {
+          cachedWargaList = json.data;
+          renderTable(cachedWargaList);
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">Belum ada data warga tersimpan.</td></tr>';
+        }
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-red-500">Gagal mengambil data dari server.</td></tr>';
+      }
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById('tableBodyWarga');
+      if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">Tidak ada data yang cocok.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(w => `
+        <tr class="hover:bg-slate-50 transition">
+          <td class="p-3 font-medium text-slate-900">${w.nama_lengkap || '-'}</td>
+          <td class="p-3 text-slate-500 font-mono text-xs">${w.nik || '-'}</td>
+          <td class="p-3 text-slate-500 font-mono text-xs">${w.id_kk || '-'}</td>
+          <td class="p-3 text-slate-700">${w.hubungan || '-'}</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-slate-100 text-slate-700">${w.kategori_khusus || '-'}</span></td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-emerald-100 text-emerald-800 font-medium">${w.status_aktif || 'Aktif'}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    function filterTable() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = cachedWargaList.filter(item => 
+        (item.nama_lengkap && item.nama_lengkap.toLowerCase().includes(q)) ||
+        (item.nik && item.nik.toString().includes(q)) ||
+        (item.id_kk && item.id_kk.toString().includes(q))
+      );
+      renderTable(filtered);
+    }
+
+    // Submit Data KK
+    document.getElementById('formKK').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btnSubmitKK');
+      btn.innerText = 'Menyimpan ke Google Sheets...';
+      btn.disabled = true;
+
+      const payload = {
+        action: 'tambahKeluarga',
+        data: {
+          id_kk: document.getElementById('id_kk').value.trim(),
+          nama_kepala: document.getElementById('nama_kepala').value.trim(),
+          blok_nomor: document.getElementById('blok_nomor').value.trim(),
+          status_tinggal: document.getElementById('status_tinggal').value,
+          no_hp: document.getElementById('no_hp').value.trim()
+        }
+      };
+
+      try {
+        // Menggunakan text/plain agar browser tidak memicu CORS Preflight (OPTIONS)
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+        const resJson = await res.json();
+        alert(resJson.message || 'Data KK berhasil disimpan!');
+        e.target.reset();
+        fetchSummary();
+      } catch (err) {
+        alert('Gagal menyimpan data KK. Pastikan izin Web App Google Apps Script diset ke "Anyone" (Siapa saja).');
+      } finally {
+        btn.innerText = 'Simpan Data KK';
+        btn.disabled = false;
+      }
+    });
+
+    // Submit Data Anggota Warga
+    document.getElementById('formWarga').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btnSubmitWarga');
+      btn.innerText = 'Menyimpan ke Google Sheets...';
+      btn.disabled = true;
+
+      const payload = {
+        action: 'tambahWarga',
+        data: {
+          nik: document.getElementById('nik').value.trim(),
+          id_kk: document.getElementById('warga_id_kk').value.trim(),
+          nama_lengkap: document.getElementById('warga_nama').value.trim(),
+          gender: document.getElementById('warga_gender').value,
+          tgl_lahir: document.getElementById('warga_tgl_lahir').value,
+          hubungan: document.getElementById('warga_hubungan').value,
+          kategori_khusus: document.getElementById('warga_kategori').value
+        }
+      };
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+        const resJson = await res.json();
+        alert(resJson.message || 'Data Warga berhasil disimpan!');
+        e.target.reset();
+        fetchSummary();
+      } catch (err) {
+        alert('Gagal menyimpan data Warga. Periksa koneksi atau izin deploy script.');
+      } finally {
+        btn.innerText = 'Simpan Anggota Warga';
+        btn.disabled = false;
+      }
+    });
+
+    // Jalankan ringkasan saat halaman pertama kali dibuka
+    fetchSummary();
+  </script>
+</body>
+</html>

@@ -4,14 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sistem Pendataan Warga RT</title>
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @media print {
+      body { background: white !important; }
+      header, .no-print, #statCards, .nav-tabs { display: none !important; }
+      #tabList { display: block !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
+      .action-col { display: none !important; }
+      table { width: 100% !important; border-collapse: collapse; }
+      th, td { border: 1px solid #cbd5e1 !important; padding: 6px 10px !important; }
+      .print-header { display: block !important; }
+    }
+  </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
   <!-- Header -->
-  <header class="bg-indigo-700 text-white shadow-md">
-    <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+  <header class="bg-indigo-700 text-white shadow-md no-print">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
       <div>
         <h1 class="text-xl font-bold tracking-wide">Portal Digital RT</h1>
         <p class="text-xs text-indigo-200">Sistem Pendataan Kependudukan & Administrasi</p>
@@ -20,9 +30,9 @@
     </div>
   </header>
 
-  <main class="max-w-5xl mx-auto px-4 py-6">
+  <main class="max-w-6xl mx-auto px-4 py-6">
     <!-- Stat Card Ringkasan -->
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+    <div id="statCards" class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
       <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
         <p class="text-xs text-slate-500 font-medium">Total Kepala Keluarga</p>
         <p id="totalKK" class="text-2xl font-bold text-indigo-600 mt-1">-</p>
@@ -38,13 +48,13 @@
     </div>
 
     <!-- Navigasi Tab -->
-    <div class="flex space-x-2 border-b border-slate-200 mb-6 overflow-x-auto">
+    <div class="nav-tabs flex space-x-2 border-b border-slate-200 mb-6 overflow-x-auto">
       <button onclick="switchTab('kk')" id="btnTabKK" class="py-2.5 px-4 font-semibold text-sm border-b-2 border-indigo-600 text-indigo-600 whitespace-nowrap">Input Data KK</button>
       <button onclick="switchTab('warga')" id="btnTabWarga" class="py-2.5 px-4 font-semibold text-sm text-slate-500 hover:text-indigo-600 whitespace-nowrap">Input Anggota Warga</button>
-      <button onclick="switchTab('list')" id="btnTabList" class="py-2.5 px-4 font-semibold text-sm text-slate-500 hover:text-indigo-600 whitespace-nowrap">Daftar & Pencarian Warga</button>
+      <button onclick="switchTab('list')" id="btnTabList" class="py-2.5 px-4 font-semibold text-sm text-slate-500 hover:text-indigo-600 whitespace-nowrap">Daftar & Kelola Warga</button>
     </div>
 
-    <!-- Tab 1: Form Input KK -->
+    <!-- Form Input KK -->
     <section id="tabKK" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8">
       <h2 class="text-lg font-bold mb-4 text-slate-800">Form Tambah Rumah / KK</h2>
       <form id="formKK" class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -58,7 +68,7 @@
         </div>
         <div>
           <label class="block text-xs font-semibold text-slate-600 mb-1">Blok / Nomor Rumah</label>
-          <input type="text" id="blok_nomor" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Contoh: A1 No. 05">
+          <input type="text" id="blok_nomor" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Contoh: Blok B No. 12">
         </div>
         <div>
           <label class="block text-xs font-semibold text-slate-600 mb-1">Status Kepemilikan/Tinggal</label>
@@ -78,17 +88,17 @@
       </form>
     </section>
 
-    <!-- Tab 2: Form Input Anggota Warga -->
+    <!-- Form Input Anggota Warga -->
     <section id="tabWarga" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8 hidden">
       <h2 class="text-lg font-bold mb-4 text-slate-800">Form Tambah Anggota Warga</h2>
       <form id="formWarga" class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">NIK (Nomor Induk Kependudukan)</label>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">NIK</label>
           <input type="number" id="nik" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="16 digit NIK">
         </div>
         <div>
           <label class="block text-xs font-semibold text-slate-600 mb-1">Nomor KK Terkait</label>
-          <input type="number" id="warga_id_kk" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Sesuai No. KK">
+          <input type="number" id="warga_id_kk" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Nomor KK">
         </div>
         <div>
           <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Lengkap</label>
@@ -130,18 +140,30 @@
       </form>
     </section>
 
-    <!-- Tab 3: Daftar Warga -->
+    <!-- Tab 3: Daftar, Cetak, dan Kelola Warga -->
     <section id="tabList" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hidden">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+      <!-- Kop Cetak Khusus Mode Print -->
+      <div class="hidden print-header text-center mb-6">
+        <h2 class="text-xl font-bold uppercase tracking-wider">Laporan Data Penduduk & Warga RT</h2>
+        <p class="text-sm text-slate-600">Dokumen Arsip Administrasi Lingkungan Rukun Tetangga</p>
+        <div class="border-b-2 border-slate-800 my-3"></div>
+      </div>
+
+      <div class="no-print flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
         <div>
           <h2 class="text-lg font-bold text-slate-800">Daftar Seluruh Warga</h2>
-          <p class="text-xs text-slate-500">Data tersimpan di Google Sheets secara realtime</p>
+          <p class="text-xs text-slate-500">Kelola data, edit, hapus, atau cetak ke PDF</p>
         </div>
-        <div class="flex gap-2 w-full sm:w-auto">
-          <input type="text" id="searchInput" oninput="filterTable()" placeholder="Cari nama / NIK..." class="border rounded-lg px-3 py-1.5 text-xs w-full sm:w-48 outline-none focus:ring-2 focus:ring-indigo-500">
-          <button onclick="fetchWargaData()" class="text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg font-medium whitespace-nowrap">Segarkan</button>
+        <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+          <input type="text" id="searchInput" oninput="filterTable()" placeholder="Cari nama / NIK..." class="border rounded-lg px-3 py-1.5 text-xs w-full sm:w-44 outline-none focus:ring-2 focus:ring-indigo-500">
+          <button onclick="fetchWargaData()" class="text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg font-medium">Segarkan</button>
+          <button onclick="window.print()" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg font-medium flex items-center gap-1 shadow-sm">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+            Cetak / PDF
+          </button>
         </div>
       </div>
+
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm">
           <thead class="bg-slate-100 text-slate-600 text-xs uppercase">
@@ -152,20 +174,85 @@
               <th class="p-3">Hubungan</th>
               <th class="p-3">Kategori</th>
               <th class="p-3">Status</th>
+              <th class="p-3 text-center action-col">Aksi</th>
             </tr>
           </thead>
           <tbody id="tableBodyWarga" class="divide-y divide-slate-100">
-            <tr><td colspan="6" class="p-4 text-center text-slate-400">Klik segarkan atau buka tab ini untuk memuat data...</td></tr>
+            <tr><td colspan="7" class="p-4 text-center text-slate-400">Klik segarkan atau buka tab ini untuk memuat data...</td></tr>
           </tbody>
         </table>
       </div>
     </section>
   </main>
 
-  <script>
-    // URL Google Apps Script yang sudah dimasukkan
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyWylxWJWBWOD2WhScR54BaKs0wjtwHfYU-S7Zi1RIyTA9WZf0xSzyUeqNPiKfr8ZYfuQ/exec";
+  <!-- MODAL EDIT DATA WARGA -->
+  <div id="modalEdit" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-base font-bold text-slate-800">Edit Data Warga</h3>
+        <button onclick="closeModalEdit()" class="text-slate-400 hover:text-slate-600 font-bold text-xl">&times;</button>
+      </div>
+      <form id="formEditWarga" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">NIK (Kunci Unik)</label>
+          <input type="text" id="edit_nik" readonly class="w-full bg-slate-100 border rounded-lg p-2 text-xs font-mono outline-none text-slate-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Nomor KK</label>
+          <input type="text" id="edit_id_kk" required class="w-full border rounded-lg p-2 text-xs outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Lengkap</label>
+          <input type="text" id="edit_nama" required class="w-full border rounded-lg p-2 text-xs outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Jenis Kelamin</label>
+          <select id="edit_gender" class="w-full border rounded-lg p-2 text-xs outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="L">Laki-laki</option>
+            <option value="P">Perempuan</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Tanggal Lahir</label>
+          <input type="date" id="edit_tgl_lahir" required class="w-full border rounded-lg p-2 text-xs outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Hubungan</label>
+          <select id="edit_hubungan" class="w-full border rounded-lg p-2 text-xs outline-none">
+            <option value="Kepala Keluarga">Kepala Keluarga</option>
+            <option value="Istri">Istri</option>
+            <option value="Anak">Anak</option>
+            <option value="Famili Lain">Famili Lain</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Status Keaktifan</label>
+          <select id="edit_status" class="w-full border rounded-lg p-2 text-xs outline-none">
+            <option value="Aktif">Aktif</option>
+            <option value="Pindah Keluar">Pindah Keluar</option>
+            <option value="Meninggal">Meninggal</option>
+          </select>
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Kategori Khusus</label>
+          <select id="edit_kategori" class="w-full border rounded-lg p-2 text-xs outline-none">
+            <option value="-">Tidak Ada</option>
+            <option value="Lansia">Lansia</option>
+            <option value="Balita">Balita</option>
+            <option value="Penerima Bansos">Penerima Bansos</option>
+            <option value="Disabilitas">Disabilitas</option>
+          </select>
+        </div>
+        <div class="md:col-span-2 flex justify-end gap-2 mt-4">
+          <button type="button" onclick="closeModalEdit()" class="px-4 py-2 text-xs font-medium bg-slate-100 hover:bg-slate-200 rounded-lg">Batal</button>
+          <button type="submit" id="btnSubmitEdit" class="px-4 py-2 text-xs font-medium bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg">Simpan Perubahan</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyWylxWJWBWOD2WhScR54BaKs0wjtwHfYU-S7Zi1RIyTA9WZf0xSzyUeqNPiKfr8ZYfuQ/exec";
     let cachedWargaList = [];
 
     function switchTab(tab) {
@@ -190,7 +277,6 @@
       }
     }
 
-    // Ambil data ringkasan angka statistik
     async function fetchSummary() {
       try {
         const res = await fetch(`${SCRIPT_URL}?action=getSummary`);
@@ -201,14 +287,13 @@
           document.getElementById('totalAktif').innerText = json.warga_aktif;
         }
       } catch (err) {
-        console.error("Gagal mengambil ringkasan data:", err);
+        console.error(err);
       }
     }
 
-    // Ambil daftar tabel warga
     async function fetchWargaData() {
       const tbody = document.getElementById('tableBodyWarga');
-      tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">Sedang memuat data dari Spreadsheet...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-400">Sedang memuat data dari Spreadsheet...</td></tr>';
       try {
         const res = await fetch(`${SCRIPT_URL}?action=getWarga`);
         const json = await res.json();
@@ -216,29 +301,42 @@
           cachedWargaList = json.data;
           renderTable(cachedWargaList);
         } else {
-          tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">Belum ada data warga tersimpan.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada data warga tersimpan.</td></tr>';
         }
       } catch (err) {
-        tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-red-500">Gagal mengambil data dari server.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-red-500">Gagal mengambil data dari server.</td></tr>';
       }
     }
 
     function renderTable(data) {
       const tbody = document.getElementById('tableBodyWarga');
       if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">Tidak ada data yang cocok.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-400">Tidak ada data yang cocok.</td></tr>';
         return;
       }
-      tbody.innerHTML = data.map(w => `
-        <tr class="hover:bg-slate-50 transition">
-          <td class="p-3 font-medium text-slate-900">${w.nama_lengkap || '-'}</td>
-          <td class="p-3 text-slate-500 font-mono text-xs">${w.nik || '-'}</td>
-          <td class="p-3 text-slate-500 font-mono text-xs">${w.id_kk || '-'}</td>
-          <td class="p-3 text-slate-700">${w.hubungan || '-'}</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-slate-100 text-slate-700">${w.kategori_khusus || '-'}</span></td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-emerald-100 text-emerald-800 font-medium">${w.status_aktif || 'Aktif'}</span></td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = data.map((w, index) => {
+        const nikClean = (w.nik || '').toString().replace(/'/g, '');
+        const kkClean = (w.id_kk || '').toString().replace(/'/g, '');
+        const isAktif = (w.status_aktif || 'Aktif') === 'Aktif';
+        const badgeColor = isAktif ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800';
+
+        return `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-3 font-medium text-slate-900">${w.nama_lengkap || '-'}</td>
+            <td class="p-3 text-slate-500 font-mono text-xs">${nikClean}</td>
+            <td class="p-3 text-slate-500 font-mono text-xs">${kkClean}</td>
+            <td class="p-3 text-slate-700">${w.hubungan || '-'}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-slate-100 text-slate-700">${w.kategori_khusus || '-'}</span></td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded text-xs ${badgeColor} font-medium">${w.status_aktif || 'Aktif'}</span></td>
+            <td class="p-3 text-center action-col">
+              <div class="flex justify-center gap-1.5">
+                <button onclick="bukaModalEdit('${nikClean}')" class="px-2.5 py-1 text-xs font-medium text-indigo-600 hover:bg-indigo-50 border border-indigo-200 rounded">Edit</button>
+                <button onclick="hapusWarga('${nikClean}', '${w.nama_lengkap}')" class="px-2.5 py-1 text-xs font-medium text-rose-600 hover:bg-rose-50 border border-rose-200 rounded">Hapus</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
 
     function filterTable() {
@@ -251,11 +349,97 @@
       renderTable(filtered);
     }
 
-    // Submit Data KK
+    // Modal Edit Handler
+    function bukaModalEdit(nik) {
+      const warga = cachedWargaList.find(w => w.nik.toString().replace(/'/g, '') === nik);
+      if (!warga) return;
+
+      document.getElementById('edit_nik').value = nik;
+      document.getElementById('edit_id_kk').value = (warga.id_kk || '').toString().replace(/'/g, '');
+      document.getElementById('edit_nama').value = warga.nama_lengkap || '';
+      document.getElementById('edit_gender').value = warga.gender || 'L';
+      
+      // Ambil format YYYY-MM-DD
+      let tgl = warga.tgl_lahir ? warga.tgl_lahir.toString().split('T')[0] : '';
+      document.getElementById('edit_tgl_lahir').value = tgl;
+      
+      document.getElementById('edit_hubungan').value = warga.hubungan || 'Kepala Keluarga';
+      document.getElementById('edit_status').value = warga.status_aktif || 'Aktif';
+      document.getElementById('edit_kategori').value = warga.kategori_khusus || '-';
+
+      document.getElementById('modalEdit').classList.remove('hidden');
+    }
+
+    function closeModalEdit() {
+      document.getElementById('modalEdit').classList.add('hidden');
+    }
+
+    // Submit Edit
+    document.getElementById('formEditWarga').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btnSubmitEdit');
+      btn.innerText = 'Menyimpan...';
+      btn.disabled = true;
+
+      const payload = {
+        action: 'updateWarga',
+        data: {
+          nik: document.getElementById('edit_nik').value,
+          id_kk: document.getElementById('edit_id_kk').value,
+          nama_lengkap: document.getElementById('edit_nama').value,
+          gender: document.getElementById('edit_gender').value,
+          tgl_lahir: document.getElementById('edit_tgl_lahir').value,
+          hubungan: document.getElementById('edit_hubungan').value,
+          status_aktif: document.getElementById('edit_status').value,
+          kategori_khusus: document.getElementById('edit_kategori').value
+        }
+      };
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+        const resJson = await res.json();
+        alert(resJson.message || 'Perubahan berhasil disimpan');
+        closeModalEdit();
+        fetchWargaData();
+        fetchSummary();
+      } catch (err) {
+        alert('Gagal memperbarui data.');
+      } finally {
+        btn.innerText = 'Simpan Perubahan';
+        btn.disabled = false;
+      }
+    });
+
+    // Hapus Warga Handler
+    async function hapusWarga(nik, nama) {
+      if (!confirm(`Apakah Anda yakin ingin menghapus data warga: ${nama} (NIK: ${nik})?`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'hapusWarga', nik: nik })
+        });
+        const resJson = await res.json();
+        alert(resJson.message || 'Data berhasil dihapus');
+        fetchWargaData();
+        fetchSummary();
+      } catch (err) {
+        alert('Gagal menghapus data.');
+      }
+    }
+
+    // Submit Baru: KK
     document.getElementById('formKK').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btnSubmitKK');
-      btn.innerText = 'Menyimpan ke Google Sheets...';
+      btn.innerText = 'Menyimpan...';
       btn.disabled = true;
 
       const payload = {
@@ -270,7 +454,6 @@
       };
 
       try {
-        // Menggunakan text/plain agar browser tidak memicu CORS Preflight (OPTIONS)
         const res = await fetch(SCRIPT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -281,18 +464,18 @@
         e.target.reset();
         fetchSummary();
       } catch (err) {
-        alert('Gagal menyimpan data KK. Pastikan izin Web App Google Apps Script diset ke "Anyone" (Siapa saja).');
+        alert('Gagal menyimpan data KK.');
       } finally {
         btn.innerText = 'Simpan Data KK';
         btn.disabled = false;
       }
     });
 
-    // Submit Data Anggota Warga
+    // Submit Baru: Warga
     document.getElementById('formWarga').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btnSubmitWarga');
-      btn.innerText = 'Menyimpan ke Google Sheets...';
+      btn.innerText = 'Menyimpan...';
       btn.disabled = true;
 
       const payload = {
@@ -319,14 +502,14 @@
         e.target.reset();
         fetchSummary();
       } catch (err) {
-        alert('Gagal menyimpan data Warga. Periksa koneksi atau izin deploy script.');
+        alert('Gagal menyimpan data Warga.');
       } finally {
         btn.innerText = 'Simpan Anggota Warga';
         btn.disabled = false;
       }
     });
 
-    // Jalankan ringkasan saat halaman pertama kali dibuka
+    // Inisialisasi awal
     fetchSummary();
   </script>
 </body>
